@@ -7,4 +7,4 @@ edition = "2018"
 
 [dependencies]
 simplelog = "0.10.2"
-penrose = "0.2"
+penrose = "0.2.1"

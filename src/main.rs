@@ -1,3 +1,6 @@
+#[macro_use]
+extern crate penrose;
+
 use penrose::{
     contrib::{
         actions::{create_or_switch_to_workspace, update_monitors_via_xrandr},
@@ -18,7 +21,6 @@ use penrose::{
     xcb::new_xcb_backed_window_manager,
     xcb::new_xcb_backed_status_bar,
     Backward, Forward, Less, More, Selector,
-    gen_keybindings, run_external, run_internal, map,
     draw::{Color, TextStyle}, 
 };
 
@@ -30,7 +32,7 @@ const FILES: &str = "discord";
 const SHOW_RUN: &str = "rofi -show run";
 const MON_1: &str = "DP-2";
 const MON_2: &str = "DP-4";
-const BAR_HEIGHT: u32 = 78; 
+const BAR_HEIGHT: u32 = 30; 
 
 fn my_layouts() -> Vec<Layout> {
     let n_main = 1;
@@ -128,15 +130,19 @@ fn main() -> penrose::Result<()> {
         "M-A-Down" => run_internal!(update_max_main, Less);
         "M-A-Right" => run_internal!(update_main_ratio, More);
         "M-A-Left" => run_internal!(update_main_ratio, Less);
+        
+        // Set volume
+        "XF86AudioLowerVolume" => run_external!("pactl set-sink-volume @DEFAULT_SINK@ -5%");
+        "XF86AudioRaiseVolume" => run_external!("pactl set-sink-volume @DEFAULT_SINK@ +5%");
+        "XF86AudioMute" => run_external!("pactl set-sink-mute @DEFAULT_SINK@ toggle");
 
         // Screen management
         "M-A-s" => run_internal!(detect_screens);
         "M-A-Escape" => run_internal!(exit);
 
-        // setting up bindings for 6 possible workspaces
-        refmap [config.ws_range()] in {
-            "M-{}" => focus_workspace [index_selectors(config.workspaces().len())];
-            "M-S-{}" => client_to_workspace [index_selectors(config.workspaces().len())];
+        map: {"1", "2", "3", "4"} to index_selectors(4) => {
+            "M-{}" => focus_workspace (REF);
+            "M-S-{}" => client_to_workspace (REF);
         };
     };
     
