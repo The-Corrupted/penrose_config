@@ -8,3 +8,15 @@ edition = "2018"
 [dependencies]
 simplelog = "0.10.2"
 penrose = "0.2.1"
+
+[profile.release]
+opt-level = 3
+debug = 0
+debug-assertions = false
+overflow-checks = false
+incremental = false
+lto = "fat"
+panic = "abort"
+codegen-units = 1
+rpath = false
+

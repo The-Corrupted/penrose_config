@@ -3,18 +3,16 @@ extern crate penrose;
 
 use penrose::{
     contrib::{
-        actions::{create_or_switch_to_workspace, update_monitors_via_xrandr},
-        extensions::{dmenu::*, Scratchpad},
+        actions::{update_monitors_via_xrandr},
+        extensions::{Scratchpad},
         hooks::{DefaultWorkspace, LayoutSymbolAsRootName, RemoveEmptyWorkspaces},
         layouts::paper,
     },
     core::{
-        bindings::KeyEventHandler,
         config::Config,
         helpers::index_selectors,
         hooks::Hooks,
         layout::{bottom_stack, side_stack, Layout, LayoutConf},
-        xconnection::XConn,
         data_types::RelativePosition,
     },
     logging_error_handler,
@@ -28,7 +26,6 @@ use simplelog::{LevelFilter, SimpleLogger};
 
 const TERM: &str = "alacritty";
 const BROWSER: &str = "firefox";
-const FILES: &str = "discord";
 const SHOW_RUN: &str = "rofi -show run";
 const MON_1: &str = "DP-2";
 const MON_2: &str = "DP-4";
@@ -51,20 +48,6 @@ fn my_layouts() -> Vec<Layout> {
     ]
 }
 
-fn dynamic_workspaces<X: XConn>() -> KeyEventHandler<X> {
-    create_or_switch_to_workspace(
-        || {
-            let options = vec!["1term", "2term", "3term", "web", "files"];
-            let menu = DMenu::new("WS-SELECT: ", options, DMenuConfig::default());
-            if let Ok(MenuMatch::Line(_, choice)) = menu.run(0) {
-                Some(choice)
-            } else {
-                None
-            }
-        },
-        my_layouts(),
-    )
-}
 
 fn main() -> penrose::Result<()> {
     SimpleLogger::init(LevelFilter::Debug, simplelog::Config::default())
@@ -96,7 +79,6 @@ fn main() -> penrose::Result<()> {
         DefaultWorkspace::new("2term", "[botm]", vec![TERM, TERM]),
         DefaultWorkspace::new("3term", "[side]", vec![TERM, TERM, TERM]),
         DefaultWorkspace::new("web", "[papr]", vec![BROWSER]),
-        DefaultWorkspace::new("files", "[botm]", vec![FILES]),
         Box::new(sb),
         sp.get_hook(),
     ];
@@ -116,7 +98,6 @@ fn main() -> penrose::Result<()> {
         "M-slash" => sp.toggle();
 
         // workspace management
-        "M-w" => dynamic_workspaces();
         "M-Tab" => run_internal!(toggle_workspace);
         "M-bracketleft" => run_internal!(cycle_screen, Forward);
         "M-bracketright" => run_internal!(cycle_screen, Backward);
@@ -147,7 +128,7 @@ fn main() -> penrose::Result<()> {
     };
     
     let sb = new_xcb_backed_status_bar(BAR_HEIGHT as usize, &TextStyle {
-        font: "hack".to_string(), 
+        font: "Hack".to_string(), 
         point_size: 12, 
         fg: Color::new_from_hex(0xffffff), 
         bg: Some(Color::new_from_hex(0x000000)), 
