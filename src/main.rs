@@ -2,6 +2,9 @@
 
 #[macro_use]
 extern crate penrose;
+use penrose_config::{
+    hooks::StartupScript
+};
 
 use penrose::{
     contrib::{
@@ -48,7 +51,7 @@ fn my_layouts() -> Vec<Layout> {
 
 
 fn main() -> penrose::Result<()> {
-    // SimpleLogger::init(LevelFilter::Debug, simplelog::Config::default()).expect("failed to init logging");
+    SimpleLogger::init(LevelFilter::Debug, simplelog::Config::default()).expect("failed to init logging");
 
     let mut config_builder = Config::default().builder();
     let config = config_builder
@@ -62,6 +65,7 @@ fn main() -> penrose::Result<()> {
     let hooks: X11rbHooks = vec![
         LayoutSymbolAsRootName::new(),
         RemoveEmptyWorkspaces::new(config.workspaces().clone()),
+        Box::new(StartupScript::new("/usr/local/scripts/penrose-config-setup.sh")),
         sp.get_hook(),
     ];
 
