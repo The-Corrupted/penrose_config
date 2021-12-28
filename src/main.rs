@@ -45,7 +45,6 @@ fn my_layouts() -> Vec<Layout> {
     vec![
         Layout::new("[side]", LayoutConf::default(), side_stack, n_main, ratio),
         Layout::new("[botm]", LayoutConf::default(), bottom_stack, n_main, ratio),
-        Layout::new("[papr]", follow_focus_conf, paper, n_main, ratio),
     ]
 }
 
