@@ -1,9 +1,11 @@
 // TODO: Add X11rb backed status bar
-
+// TODO: Electron applications appear to cause issues with penrose
+// See if making them float fixes this.
 #[macro_use]
 extern crate penrose;
 use penrose_config::{
-    hooks::StartupScript
+    hooks::StartupScript,
+    layouts::stack_sides,
 };
 
 use penrose::{
@@ -11,7 +13,6 @@ use penrose::{
         actions::{update_monitors_via_xrandr},
         extensions::{Scratchpad},
         hooks::{LayoutSymbolAsRootName, RemoveEmptyWorkspaces},
-        layouts::paper,
     },
     core::{
         config::Config,
@@ -35,14 +36,9 @@ const MON_2: &str = "DP-4";
 fn my_layouts() -> Vec<Layout> {
     let n_main = 1;
     let ratio = 0.6;
-    let follow_focus_conf = LayoutConf {
-        floating: true,
-        gapless: false,
-        follow_focus: true,
-        allow_wrapping: false,
-    };
 
     vec![
+        Layout::new("[sides]", LayoutConf::default(), stack_sides, 0u32, 0f32),
         Layout::new("[side]", LayoutConf::default(), side_stack, n_main, ratio),
         Layout::new("[botm]", LayoutConf::default(), bottom_stack, n_main, ratio),
     ]
